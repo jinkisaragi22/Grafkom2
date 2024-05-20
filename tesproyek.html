@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+      }
+      .webgl {
+        background-color: gray;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas class="webgl"></canvas>
+    <script src="three.js"></script>
+    <script type="module" src="GLTFLoader.js"></script>
+    <script type="module">
+      let mixer;
+      const clock = new THREE.Clock();
+      import { GLTFLoader } from "./GLTFloader.js";
+      import { OrbitControls } from "./OrbitControls.js";
+      import { PointerLockControls } from "./PointerLockControls.js";
+      var orbitcontrol;
+      var pointerlock;
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.01,
+        200
+      );
+      let canvas = document.querySelector(".webgl");
+      var renderer = new THREE.WebGL1Renderer({
+        canvas: canvas,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.antialias = 1;
+      document.body.appendChild(renderer.domElement);
+
+      var loader = new GLTFLoader();
+      var obj;
+      orbitcontrol = new OrbitControls(camera, renderer.domElement);
+      orbitcontrol.update();
+      pointerlock = new PointerLockControls(camera, renderer.domElement);
+      scene.background = new THREE.Color(0x2a2a27);
+
+      loader.load("./assets/patung1/scene.gltf", function (gltf) { //kuda
+        const model = gltf.scene;
+        model.position.set(30, 3.5, -7);
+        model.rotation.y = 4.5;
+        model.scale.set(0.25, 0.25, 0.25);
+        scene.add(model);
+        animate();
+      });
+
+      loader.load("./assets/patung2/scene.gltf", function (gltf) { //ulo
+        const model = gltf.scene;
+        model.position.set(24.3, 3.5, -7);
+        model.scale.set(0.25, 0.25, 0.25);
+        model.rotation.y = 4.5;
+        scene.add(model);
+        mixer = new THREE.AnimationMixer(model);
+        mixer.clipAction(gltf.animations[0]).play();
+        animate();
+      });
+
+      loader.load("./assets/patung3/scene.gltf", function (gltf) { //mbing
+        const model = gltf.scene;
+        model.position.set(30, 5, -11);
+        model.scale.set(1.5, 1.5, 1.5);
+        scene.add(model);
+        mixer = new THREE.AnimationMixer(model);
+        mixer.clipAction(gltf.animations[0]).play();
+        animate();
+      });
+
+      loader.load("./assets/patung4/scene.gltf", function (gltf) { //mesir
+        const model = gltf.scene;
+        model.position.set(24, 3.5, -11);
+        model.scale.set(0.15, 0.15, 0.15);
+        scene.add(model);
+        model.rotation.y = 1.5;
+        mixer = new THREE.AnimationMixer(model);
+        mixer.clipAction(gltf.animations[0]).play();
+        animate();
+      });
+
+      loader.load("./assets/museum/scene.gltf", function (gltf) {
+        const model = gltf.scene;
+        model.position.set(27, 3.3, -10);
+        model.scale.set(1, 1, 1);
+        model.rotation.y = 1.6
+        scene.add(model);
+        mixer = new THREE.AnimationMixer(model);
+        mixer.clipAction(gltf.animations[0]).play();
+        animate();
+      });
+
+      let keyboard = {};
+      document.addEventListener("keydown", function (e) {
+        keyboard[e.key] = true;
+        if (e.key == "x") {
+          pointerlock.lock();
+        }
+      });
+      document.addEventListener("keyup", function (e) {
+        keyboard[e.key] = false;
+      });
+
+      document.addEventListener('click', function () {
+        pointerlock.lock();
+      });
+
+      var light = new THREE.HemisphereLight(0xffffff, 0x000000, 5);
+      scene.add(light);
+      camera.position.set(27, 5, -3);
+
+      const boundaries = {
+        minX: 24,
+        maxX: 30,
+        minY: 4.7,
+        maxY: 5,
+        minZ: -18,
+        maxZ: -3
+      };
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const delta = clock.getDelta();
+        if (mixer) mixer.update(delta);
+
+        const moveSpeed = 5;
+        const direction = new THREE.Vector3();
+        camera.getWorldDirection(direction);
+        direction.normalize();
+
+        const right = new THREE.Vector3();
+        right.crossVectors(camera.up, direction).normalize();
+
+        let newPosition = camera.position.clone();
+
+        if (keyboard["w"]) {
+          newPosition.addScaledVector(direction, moveSpeed * delta);
+        }
+        if (keyboard["s"]) {
+          newPosition.addScaledVector(direction, -moveSpeed * delta);
+        }
+        if (keyboard["a"]) {
+          newPosition.addScaledVector(right, moveSpeed * delta); // Adjusted to move left correctly
+        }
+        if (keyboard["d"]) {
+          newPosition.addScaledVector(right, -moveSpeed * delta); // Adjusted to move right correctly
+        }
+
+        // Constrain movement within the boundaries
+        if (newPosition.x < boundaries.minX) newPosition.x = boundaries.minX;
+        if (newPosition.x > boundaries.maxX) newPosition.x = boundaries.maxX;
+        if (newPosition.y < boundaries.minY) newPosition.y = boundaries.minY;
+        if (newPosition.y > boundaries.maxY) newPosition.y = boundaries.maxY;
+        if (newPosition.z < boundaries.minZ) newPosition.z = boundaries.minZ;
+        if (newPosition.z > boundaries.maxZ) newPosition.z = boundaries.maxZ;
+
+        camera.position.copy(newPosition);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+    </script>
+  </body>
+</html>
