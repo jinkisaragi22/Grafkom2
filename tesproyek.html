@@ -53,6 +53,17 @@
       pointerlock = new PointerLockControls(camera, renderer.domElement);
       scene.background = new THREE.Color(0x2a2a27);
 
+      loader.load("./assets/museum/scene.gltf", function (gltf) {
+        const model = gltf.scene;
+        model.position.set(27, 0, -35);
+        model.scale.set(5, 5, 5);
+        model.rotation.y = 1.6;
+        scene.add(model);
+        mixer = new THREE.AnimationMixer(model);
+        mixer.clipAction(gltf.animations[0]).play();
+        animate();
+      });
+
       loader.load("./assets/patung1/scene.gltf", function (gltf) { //kuda
         const model = gltf.scene;
         model.position.set(45, 0, -24);
@@ -90,20 +101,33 @@
         model.scale.set(0.006, 0.006, 0.006);
         model.rotation.y = 0.1;
         scene.add(model);
-        pianoModel = model; // Store the piano model for distance checking
+        pianoModel = model; 
         animate();
       });
 
-      loader.load("./assets/museum/scene.gltf", function (gltf) {
+      loader.load("./assets/lampu1/scene.gltf", function (gltf) { //lampu
         const model = gltf.scene;
-        model.position.set(27, 0, -35);
+        model.position.set(42, 5, -72);
         model.scale.set(5, 5, 5);
-        model.rotation.y = 1.6;
+        model.rotation.y = 0.1;
         scene.add(model);
-        mixer = new THREE.AnimationMixer(model);
-        mixer.clipAction(gltf.animations[0]).play();
+      
+        // Add red spotlight for lampu1
+        const spotLight = new THREE.SpotLight(0xffffff); 
+        spotLight.position.set(42, 10, -72);
+        spotLight.target = model;
+        spotLight.castShadow = true;
+        spotLight.intensity = 3; 
+        spotLight.angle = Math.PI / 4; 
+        spotLight.distance = 50; 
+        spotLight.penumbra = 0.5; 
+      
+        scene.add(spotLight);
+        scene.add(spotLight.target);
+      
         animate();
       });
+      
 
       let keyboard = {};
       document.addEventListener("keydown", function (e) {
@@ -173,7 +197,7 @@
 
         if (pianoModel) {
           const distance = camera.position.distanceTo(pianoModel.position);
-          if (distance < 10) { 
+          if (distance < 5) { 
             audio.pause();
           } else {
             audio.play();
