@@ -17,7 +17,7 @@
 
   <body>
     <canvas class="webgl"></canvas>
-    <audio id="background-music" src="./assets/horrorPianoBacksound.mp3" loop autoplay></audio> <!-- Add your audio file path here -->
+    <audio id="background-music" src="./assets/horrorPianoBacksound.mp3" loop autoplay></audio>
     <script src="three.js"></script>
     <script type="module" src="GLTFLoader.js"></script>
     <script type="module">
@@ -45,6 +45,7 @@
 
       const audio = document.getElementById('background-music');
       var pianoModel;
+      var patung1Model;
 
       var loader = new GLTFLoader();
       var obj;
@@ -70,6 +71,7 @@
         model.scale.set(1, 1, 1);
         model.rotation.y = 4.5;
         scene.add(model);
+        patung1Model = model;
         animate();
       });
 
@@ -111,23 +113,22 @@
         model.scale.set(5, 5, 5);
         model.rotation.y = 0.1;
         scene.add(model);
-      
+
         // Add red spotlight for lampu1
-        const spotLight = new THREE.SpotLight(0xffffff); 
+        const spotLight = new THREE.SpotLight(0xff0000); 
         spotLight.position.set(42, 10, -72);
         spotLight.target = model;
         spotLight.castShadow = true;
-        spotLight.intensity = 3; 
+        spotLight.intensity = 2; 
         spotLight.angle = Math.PI / 4; 
         spotLight.distance = 50; 
         spotLight.penumbra = 0.5; 
-      
+
         scene.add(spotLight);
         scene.add(spotLight.target);
-      
+
         animate();
       });
-      
 
       let keyboard = {};
       document.addEventListener("keydown", function (e) {
@@ -195,12 +196,28 @@
 
         camera.position.copy(newPosition);
 
+        //if buat cek jarak pause audio ke piano
         if (pianoModel) {
           const distance = camera.position.distanceTo(pianoModel.position);
           if (distance < 5) { 
             audio.pause();
           } else {
             audio.play();
+          }
+        }
+
+        // if buat patung kuda ikut posisi kamera
+        if (patung1Model) {
+          const patung1Direction = new THREE.Vector3();
+          patung1Model.getWorldDirection(patung1Direction);
+          patung1Direction.normalize();
+
+          const toPatung1 = new THREE.Vector3();
+          toPatung1.subVectors(patung1Model.position, camera.position).normalize();
+
+          const dotProduct = patung1Direction.dot(toPatung1);
+          if (dotProduct < 0.9) {
+            patung1Model.lookAt(camera.position);
           }
         }
 
