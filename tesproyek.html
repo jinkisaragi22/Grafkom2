@@ -17,6 +17,7 @@
 
   <body>
     <canvas class="webgl"></canvas>
+    <audio id="background-music" src="./assets/horrorPianoBacksound.mp3" loop autoplay></audio> <!-- Add your audio file path here -->
     <script src="three.js"></script>
     <script type="module" src="GLTFLoader.js"></script>
     <script type="module">
@@ -42,6 +43,9 @@
       renderer.antialias = 1;
       document.body.appendChild(renderer.domElement);
 
+      const audio = document.getElementById('background-music');
+      var pianoModel;
+
       var loader = new GLTFLoader();
       var obj;
       orbitcontrol = new OrbitControls(camera, renderer.domElement);
@@ -51,28 +55,18 @@
 
       loader.load("./assets/patung1/scene.gltf", function (gltf) { //kuda
         const model = gltf.scene;
-        model.position.set(30, 3.5, -7);
+        model.position.set(45, 0, -24);
+        model.scale.set(1, 1, 1);
         model.rotation.y = 4.5;
-        model.scale.set(0.25, 0.25, 0.25);
         scene.add(model);
         animate();
       });
 
       loader.load("./assets/patung2/scene.gltf", function (gltf) { //ulo
         const model = gltf.scene;
-        model.position.set(24.3, 3.5, -7);
-        model.scale.set(0.25, 0.25, 0.25);
+        model.position.set(11, 0, -24);
+        model.scale.set(1, 1, 1);
         model.rotation.y = 4.5;
-        scene.add(model);
-        mixer = new THREE.AnimationMixer(model);
-        mixer.clipAction(gltf.animations[0]).play();
-        animate();
-      });
-
-      loader.load("./assets/patung3/scene.gltf", function (gltf) { //mbing
-        const model = gltf.scene;
-        model.position.set(30, 5, -11);
-        model.scale.set(1.5, 1.5, 1.5);
         scene.add(model);
         mixer = new THREE.AnimationMixer(model);
         mixer.clipAction(gltf.animations[0]).play();
@@ -81,8 +75,8 @@
 
       loader.load("./assets/patung4/scene.gltf", function (gltf) { //mesir
         const model = gltf.scene;
-        model.position.set(24, 3.5, -11);
-        model.scale.set(0.15, 0.15, 0.15);
+        model.position.set(10, 0, -42);
+        model.scale.set(0.5, 0.5, 0.5);
         scene.add(model);
         model.rotation.y = 1.5;
         mixer = new THREE.AnimationMixer(model);
@@ -90,11 +84,21 @@
         animate();
       });
 
+      loader.load("./assets/piano/scene.gltf", function (gltf) { //piano
+        const model = gltf.scene;
+        model.position.set(21, 2, -70);
+        model.scale.set(0.006, 0.006, 0.006);
+        model.rotation.y = 0.1;
+        scene.add(model);
+        pianoModel = model; // Store the piano model for distance checking
+        animate();
+      });
+
       loader.load("./assets/museum/scene.gltf", function (gltf) {
         const model = gltf.scene;
-        model.position.set(27, 3.3, -10);
-        model.scale.set(1, 1, 1);
-        model.rotation.y = 1.6
+        model.position.set(27, 0, -35);
+        model.scale.set(5, 5, 5);
+        model.rotation.y = 1.6;
         scene.add(model);
         mixer = new THREE.AnimationMixer(model);
         mixer.clipAction(gltf.animations[0]).play();
@@ -120,14 +124,14 @@
       scene.add(light);
       camera.position.set(27, 5, -3);
 
-      const boundaries = {
-        minX: 24,
-        maxX: 30,
-        minY: 4.7,
-        maxY: 5,
-        minZ: -18,
-        maxZ: -3
-      };
+      //const boundaries = {
+        //minX: 24,
+        //maxX: 30,
+        //minY: 4.7,
+        //maxY: 5,
+        //minZ: -18,
+        //maxZ: -3
+      //};
 
       function animate() {
         requestAnimationFrame(animate);
@@ -142,7 +146,7 @@
         const right = new THREE.Vector3();
         right.crossVectors(camera.up, direction).normalize();
 
-        let newPosition = camera.position.clone();
+        let newPosition = camera.position.clone();  
 
         if (keyboard["w"]) {
           newPosition.addScaledVector(direction, moveSpeed * delta);
@@ -158,14 +162,23 @@
         }
 
         // Constrain movement within the boundaries
-        if (newPosition.x < boundaries.minX) newPosition.x = boundaries.minX;
-        if (newPosition.x > boundaries.maxX) newPosition.x = boundaries.maxX;
-        if (newPosition.y < boundaries.minY) newPosition.y = boundaries.minY;
-        if (newPosition.y > boundaries.maxY) newPosition.y = boundaries.maxY;
-        if (newPosition.z < boundaries.minZ) newPosition.z = boundaries.minZ;
-        if (newPosition.z > boundaries.maxZ) newPosition.z = boundaries.maxZ;
+        //if (newPosition.x < boundaries.minX) newPosition.x = boundaries.minX;
+        //if (newPosition.x > boundaries.maxX) newPosition.x = boundaries.maxX;
+        //if (newPosition.y < boundaries.minY) newPosition.y = boundaries.minY;
+        //if (newPosition.y > boundaries.maxY) newPosition.y = boundaries.maxY;
+        //if (newPosition.z < boundaries.minZ) newPosition.z = boundaries.minZ;
+        //if (newPosition.z > boundaries.maxZ) newPosition.z = boundaries.maxZ;
 
         camera.position.copy(newPosition);
+
+        if (pianoModel) {
+          const distance = camera.position.distanceTo(pianoModel.position);
+          if (distance < 10) { // Adjust the distance threshold as needed
+            audio.pause();
+          } else {
+            audio.play();
+          }
+        }
 
         renderer.render(scene, camera);
       }
