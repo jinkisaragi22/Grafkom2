@@ -155,10 +155,10 @@
           newPosition.addScaledVector(direction, -moveSpeed * delta);
         }
         if (keyboard["a"]) {
-          newPosition.addScaledVector(right, moveSpeed * delta); // Adjusted to move left correctly
+          newPosition.addScaledVector(right, moveSpeed * delta);
         }
         if (keyboard["d"]) {
-          newPosition.addScaledVector(right, -moveSpeed * delta); // Adjusted to move right correctly
+          newPosition.addScaledVector(right, -moveSpeed * delta); 
         }
 
         // Constrain movement within the boundaries
@@ -173,7 +173,7 @@
 
         if (pianoModel) {
           const distance = camera.position.distanceTo(pianoModel.position);
-          if (distance < 10) { // Adjust the distance threshold as needed
+          if (distance < 10) { 
             audio.pause();
           } else {
             audio.play();
