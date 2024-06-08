@@ -44,6 +44,8 @@
       const mixers = [];
       let pianoModel;
       let patung1Model;
+      let hewan2Model;
+      let movingUp = true;
 
       const loader = new GLTFLoader();
       const orbitcontrol = new OrbitControls(camera, renderer.domElement);
@@ -100,11 +102,11 @@
         model.rotation.y = 0.1;
         scene.add(model);
 
-        const spotLight = new THREE.SpotLight(0xff0000); 
+        const spotLight = new THREE.SpotLight(0xffffff); 
         spotLight.position.set(42, 10, -72);
         spotLight.target = model;
         spotLight.castShadow = true;
-        spotLight.intensity = 2; 
+        spotLight.intensity = 4; 
         spotLight.angle = Math.PI / 4; 
         spotLight.distance = 50; 
         spotLight.penumbra = 0.5; 
@@ -121,6 +123,7 @@
         model.rotation.y = 3.2;
         model.rotation.z = 2;
         scene.add(model);
+        hewan2Model = model;
         if (gltf.animations.length > 0) {
           const mixer = new THREE.AnimationMixer(model);
           mixer.clipAction(gltf.animations[0]).play();
@@ -177,9 +180,10 @@
 
         camera.position.copy(newPosition);
 
+        // pengecekan sound piano
         if (pianoModel) {
           const distance = camera.position.distanceTo(pianoModel.position);
-          if (distance < 5) { 
+          if (distance < 10) { 
             audio.pause();
           } else {
             audio.play();
@@ -188,6 +192,21 @@
 
         if (patung1Model) {
           patung1Model.lookAt(camera.position);
+        }
+
+        // pengecekan animasi kecoa
+        if (hewan2Model) {
+          if (movingUp) {
+            hewan2Model.position.y += delta; 
+            if (hewan2Model.position.y >= 12) {
+              movingUp = false;
+            }
+          } else {
+            hewan2Model.position.y -= delta;
+            if (hewan2Model.position.y <= 2) {
+              movingUp = true;
+            }
+          }
         }
 
         renderer.render(scene, camera);
