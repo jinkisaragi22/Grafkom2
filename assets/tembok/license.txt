@@ -1,0 +1,8 @@
+Model Information:
+* title:	EG1002_2024_v1 V100_wall2
+* source:	https://sketchfab.com/3d-models/eg1002-2024-v1-v100-wall2-06a2b8473cfb4b958943456f263ccd4a
+* author:	Keith_Pamment (https://sketchfab.com/Keith_Pamment)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
