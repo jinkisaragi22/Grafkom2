@@ -17,14 +17,10 @@
 
   <body>
     <canvas class="webgl"></canvas>
-    <audio
-      id="background-music"
-      src="./assets/horrorPianoBacksound.mp3"
-      loop
-      autoplay
-    ></audio>
+    <audio id="background-music" src="./assets/horrorPianoBacksound.mp3" loop autoplay></audio>
     <audio id="id-batu" src="./assets/suaraBatu.mp3"></audio>
     <audio id="id-kelelawar" src="./assets/batSound.mp3"></audio>
+    <audio id="id-mumi" src="./assets/soundMumi.mp3"></audio>
     <script src="three.js"></script>
     <script type="module" src="GLTFLoader.js"></script>
     <script type="module">
@@ -50,6 +46,7 @@
       const audio = document.getElementById("background-music");
       const audioBatu = document.getElementById("id-batu");
       const batSound = document.getElementById("id-kelelawar");
+      const soundMumi = document.getElementById("id-mumi");
       const mixers = [];
       let pianoModel;
       let kelelawar1Model;
@@ -57,10 +54,11 @@
       let kelelawar3Model;
       let hewan2Model;
       let hewan3Model;
-      let hewan3Mixer, hewan3Action1, hewan3Action2, hewan3Action3;
+      let hewan3Mixer, hewan3Action1, hewan3Action2;
       let patung1Model;
       let patung4Model;
       let patung5Model;
+      let patung5Mixer, patung5Action;
       let movingLeft = true;
       let movingUp = true;
       let falling = false;
@@ -80,6 +78,17 @@
         model.scale.set(5, 5, 5);
         model.rotation.y = 1.6;
         scene.add(model);
+
+        model.traverse((child)=>{
+          console.log(child)
+          if(child.material && child.id != 249){
+            console.log(child.material.map)
+            const texture = child.material.map;
+            child.material = new THREE.MeshPhongMaterial({
+              map: texture,
+            });
+          }
+        })
       });
 
       loader.load("./assets/patung1/scene.gltf", function (gltf) {
@@ -115,7 +124,7 @@
         //piano
         const model = gltf.scene;
         model.position.set(21, 2, -70);
-        model.scale.set(0.006, 0.006, 0.006);
+        model.scale.set(0.006 , 0.006, 0.006);
         scene.add(model);
         pianoModel = model;
       });
@@ -128,14 +137,19 @@
         model.rotation.y = 0.1;
         scene.add(model);
 
-        const spotLight = new THREE.SpotLight(0xffffff);
+        const spotLight = new THREE.SpotLight(0xffd8b1);
         spotLight.position.set(42, 10, -72);
-        spotLight.target = model;
+        spotLight.target.position.set(model.position.x, 0, model.position.z)
+        spotLight.target.updateMatrixWorld();
         spotLight.castShadow = true;
-        spotLight.intensity = 4;
-        spotLight.angle = Math.PI / 4;
+        spotLight.intensity = 1.5;
+        spotLight.angle = Math.PI / 3;
         spotLight.distance = 50;
-        spotLight.penumbra = 0.5;
+        spotLight.penumbra = 1.5;
+        spotLight.decay = 2
+
+        const sphelper = new THREE.SpotLightHelper(spotLight);
+        scene.add(sphelper);
 
         scene.add(spotLight);
         scene.add(spotLight.target);
@@ -144,11 +158,28 @@
       loader.load("./assets/lampu2/scene.gltf", function (gltf) {
         //lampu meja
         const model = gltf.scene;
-        model.position.set(9.75, 3.7, -68.3);
+        model.position.set(9.7, 3.7, -69.5);
         model.scale.set(0.05, 0.05, 0.05);
         scene.add(model);
-      });
 
+        const spotLight = new THREE.SpotLight(0xffd8b1);
+        spotLight.position.set(model.position.x, model.position.y+2, model.position.z);
+        spotLight.target.position.set(model.position.x, 0, model.position.z)
+        spotLight.target.updateMatrixWorld();
+        spotLight.castShadow = true;
+        spotLight.intensity = 1.5;
+        spotLight.angle = Math.PI / 4;
+        spotLight.distance = 50;
+        spotLight.penumbra = 1.5;
+        spotLight.decay = 3
+
+        const sphelper = new THREE.SpotLightHelper(spotLight);
+        scene.add(sphelper);
+
+        scene.add(spotLight);
+        scene.add(spotLight.target);
+      });
+      
       loader.load("./assets/hewan3/scene.gltf", function (gltf) {
         // laba - laba
         const model = gltf.scene;
@@ -161,9 +192,7 @@
           hewan3Mixer = new THREE.AnimationMixer(model);
           hewan3Action1 = hewan3Mixer.clipAction(gltf.animations[1]);
           hewan3Action2 = hewan3Mixer.clipAction(gltf.animations[2]);
-          hewan3Action3 = hewan3Mixer.clipAction(gltf.animations[3]);
           hewan3Action1.play();
-          hewan3Action3.setLoop(THREE.LoopOnce);
           mixers.push(hewan3Mixer);
         }
       });
@@ -240,9 +269,9 @@
         scene.add(model);
         patung5Model = model;
         if (gltf.animations.length > 0) {
-          const mixer = new THREE.AnimationMixer(model);
-          mixer.clipAction(gltf.animations[0]).play();
-          mixers.push(mixer);
+          patung5Mixer = new THREE.AnimationMixer(model);
+          patung5Action = patung5Mixer.clipAction(gltf.animations[0]);
+          mixers.push(patung5Mixer);
         }
       });
 
@@ -261,13 +290,14 @@
         pointerlock.lock();
       });
 
-      const light = new THREE.HemisphereLight(0xffffff, 0x000000, 5);
+      const light = new THREE.HemisphereLight(0xffffff, 0x000000, 0.7);
       scene.add(light);
-      camera.position.set(27, 5, -3);
+      //camera.position.set(27, 5, -3);
+      camera.position.set(27, 5, -60);
+      camera.lookAt(12,5,-60)
 
-      let arah = "right";
-      let hewan3Action3Played = false;
-
+      let arah = 'right';
+      
       function animate() {
         requestAnimationFrame(animate);
         const delta = clock.getDelta();
@@ -313,17 +343,22 @@
 
         // pengecekan arah liat patung kuda
         if (patung1Model) {
-          patung1Model.lookAt(camera.position);
+          patung1Model.lookAt(camera.position); 
         }
 
         // pengecekan pergerakan kelelawar
         if (kelelawar1Model) {
+          //console.log(`Current direction: ${arah}`);
+          //console.log(
+          //  `Position: x=${kelelawar1Model.position.x}, z=${kelelawar1Model.position.z}`
+          //);
+
           if (arah === "right") {
             if (kelelawar1Model.position.x < 40) {
               kelelawar1Model.position.x += delta * 10;
             } else {
               arah = "forward";
-              kelelawar1Model.rotation.y = Math.PI / 2;
+              kelelawar1Model.rotation.y = Math.PI /2 ;
             }
           } else if (arah === "forward") {
             if (kelelawar1Model.position.z > -70) {
@@ -366,29 +401,26 @@
           }
         }
 
-        // laba-laba
-        if (hewan3Model) {
+        if(hewan3Model){
           const distance = camera.position.distanceTo(hewan3Model.position);
-
-          if (movingLeft) {
-            hewan3Model.position.x -= delta * 10;
-            if (distance < 5) {
-              if (!hewan3Action2.isRunning()) {
-                hewan3Action1.stop();
-                hewan3Action2.play();
-              }
-            } else {
-              if (!hewan3Action1.isRunning()) {
-                hewan3Action2.stop();
-                hewan3Action1.play();
-              }
-            }
+          if(distance < 7){
+              hewan3Action1.stop();
+              hewan3Action2.play();
+          } else {
+              hewan3Action2.stop();
+              hewan3Action1.play();
           }
-          if (hewan3Model.position.x <= 10) {
-            movingLeft = false;
-            hewan3Action1.stop();
-            if (!hewan3Action3.isRunning()) {
-              hewan3Action3.reset().play()
+          if(movingLeft){
+            hewan3Model.position.x -= delta * 3;
+            if(hewan3Model.position.x <= 10){
+              movingLeft = false;
+              hewan3Model.rotation.y = 1;
+            }
+          } else {
+            hewan3Model.position.x += delta * 3;
+            if(hewan3Model.position.x >= 45){
+              movingLeft = true;
+              hewan3Model.rotation.y = 4;
             }
           }
         }
@@ -404,6 +436,16 @@
             if (fallenAngle <= targetAngle) {
               audioBatu.play();
             }
+          }
+        }
+
+        if(patung5Model){
+          const distance = camera.position.distanceTo(patung5Model.position);
+          if(distance < 10){
+              patung5Action.play();
+              soundMumi.play();
+          }else{
+            patung5Action.stop();
           }
         }
 
