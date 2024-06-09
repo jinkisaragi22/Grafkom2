@@ -17,7 +17,12 @@
 
   <body>
     <canvas class="webgl"></canvas>
-    <audio id="background-music" src="./assets/horrorPianoBacksound.mp3" loop autoplay></audio>
+    <audio
+      id="background-music"
+      src="./assets/horrorPianoBacksound.mp3"
+      loop
+      autoplay
+    ></audio>
     <audio id="id-batu" src="./assets/suaraBatu.mp3"></audio>
     <audio id="id-kelelawar" src="./assets/batSound.mp3"></audio>
     <script src="three.js"></script>
@@ -110,7 +115,7 @@
         //piano
         const model = gltf.scene;
         model.position.set(21, 2, -70);
-        model.scale.set(0.006 , 0.006, 0.006);
+        model.scale.set(0.006, 0.006, 0.006);
         scene.add(model);
         pianoModel = model;
       });
@@ -143,7 +148,7 @@
         model.scale.set(0.05, 0.05, 0.05);
         scene.add(model);
       });
-      
+
       loader.load("./assets/hewan3/scene.gltf", function (gltf) {
         // laba - laba
         const model = gltf.scene;
@@ -158,6 +163,7 @@
           hewan3Action2 = hewan3Mixer.clipAction(gltf.animations[2]);
           hewan3Action3 = hewan3Mixer.clipAction(gltf.animations[3]);
           hewan3Action1.play();
+          hewan3Action3.setLoop(THREE.LoopOnce);
           mixers.push(hewan3Mixer);
         }
       });
@@ -259,8 +265,9 @@
       scene.add(light);
       camera.position.set(27, 5, -3);
 
-      let arah = 'right';
-      
+      let arah = "right";
+      let hewan3Action3Played = false;
+
       function animate() {
         requestAnimationFrame(animate);
         const delta = clock.getDelta();
@@ -306,22 +313,17 @@
 
         // pengecekan arah liat patung kuda
         if (patung1Model) {
-          patung1Model.lookAt(camera.position); 
+          patung1Model.lookAt(camera.position);
         }
 
         // pengecekan pergerakan kelelawar
         if (kelelawar1Model) {
-          console.log(`Current direction: ${arah}`);
-          console.log(
-            `Position: x=${kelelawar1Model.position.x}, z=${kelelawar1Model.position.z}`
-          );
-
           if (arah === "right") {
             if (kelelawar1Model.position.x < 40) {
               kelelawar1Model.position.x += delta * 10;
             } else {
               arah = "forward";
-              kelelawar1Model.rotation.y = Math.PI /2 ;
+              kelelawar1Model.rotation.y = Math.PI / 2;
             }
           } else if (arah === "forward") {
             if (kelelawar1Model.position.z > -70) {
@@ -364,24 +366,29 @@
           }
         }
 
-        if(hewan3Model){
+        // laba-laba
+        if (hewan3Model) {
           const distance = camera.position.distanceTo(hewan3Model.position);
-          if(distance < 5){
-            if (!hewan3Action2.isRunning()) {
-              hewan3Action1.stop();
-              hewan3Action2.play();
-            }
-          } else {
-            if (!hewan3Action1.isRunning()) {
-              hewan3Action2.stop();
-              hewan3Action1.play();
+
+          if (movingLeft) {
+            hewan3Model.position.x -= delta * 10;
+            if (distance < 5) {
+              if (!hewan3Action2.isRunning()) {
+                hewan3Action1.stop();
+                hewan3Action2.play();
+              }
+            } else {
+              if (!hewan3Action1.isRunning()) {
+                hewan3Action2.stop();
+                hewan3Action1.play();
+              }
             }
           }
-          if(movingLeft){
-            hewan3Model.position.x -= delta;
-            if(hewan3Model.position.x <= 10){
-              movingLeft = false; 
-              hewan3Action3.play();
+          if (hewan3Model.position.x <= 10) {
+            movingLeft = false;
+            hewan3Action1.stop();
+            if (!hewan3Action3.isRunning()) {
+              hewan3Action3.reset().play()
             }
           }
         }
