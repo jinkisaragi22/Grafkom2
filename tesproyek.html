@@ -155,12 +155,11 @@
           mixers.push(mixer);
         }
       });
-      
+
       loader.load("./assets/hewan1/scene.gltf", function (gltf) {
         // kelelawar
         const model = gltf.scene;
-        model.position.set(19, 5, -75);
-        model.rotation.y = Math.PI * 1.5;
+        model.position.set(10, 23, -2);
         model.scale.set(1, 1, 1);
         scene.add(model);
         kelelawar1Model = model;
@@ -237,6 +236,8 @@
       scene.add(light);
       camera.position.set(27, 5, -3);
 
+      let arah = 'right';
+      
       function animate() {
         requestAnimationFrame(animate);
         const delta = clock.getDelta();
@@ -272,7 +273,6 @@
           const distance = camera.position.distanceTo(pianoModel.position);
           if (distance < 10) {
             audio.pause();
-            kelelawar1Model.position.z += delta * 30;
             kelelawar2Model.position.z += delta * 30;
             kelelawar3Model.position.z += delta * 30;
             batSound.play();
@@ -283,6 +283,43 @@
 
         if (patung1Model) {
           patung1Model.lookAt(camera.position);
+        }
+
+        if (kelelawar1Model) {
+          console.log(`Current direction: ${arah}`);
+          console.log(
+            `Position: x=${kelelawar1Model.position.x}, z=${kelelawar1Model.position.z}`
+          );
+
+          if (arah === "right") {
+            if (kelelawar1Model.position.x < 40) {
+              kelelawar1Model.position.x += delta * 10;
+            } else {
+              arah = "forward";
+              kelelawar1Model.rotation.y = Math.PI /2 ; // Rotate to face forward
+            }
+          } else if (arah === "forward") {
+            if (kelelawar1Model.position.z > -70) {
+              kelelawar1Model.position.z -= delta * 10;
+            } else {
+              arah = "left";
+              kelelawar1Model.rotation.y = Math.PI / 2; // Rotate to face left
+            }
+          } else if (arah === "left") {
+            if (kelelawar1Model.position.x > 15) {
+              kelelawar1Model.position.x -= delta * 10;
+            } else {
+              arah = "backward";
+              kelelawar1Model.rotation.y = Math.PI / 2; // Rotate to face backward
+            }
+          } else if (arah === "backward") {
+            if (kelelawar1Model.position.z < -2) {
+              kelelawar1Model.position.z += delta * 10;
+            } else {
+              arah = "right";
+              kelelawar1Model.rotation.y = Math.PI; // Rotate to face right again
+            }
+          }
         }
 
         // pengecekan animasi kecoa
