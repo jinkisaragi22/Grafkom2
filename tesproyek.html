@@ -52,7 +52,9 @@
       const batSound = document.getElementById("id-kelelawar");
       const mixers = [];
       let pianoModel;
-      let hewan1Model;
+      let kelelawar1Model;
+      let kelelawar2Model;
+      let kelelawar3Model;
       let hewan2Model;
       let patung1Model;
       let patung2Model;
@@ -157,11 +159,41 @@
       loader.load("./assets/hewan1/scene.gltf", function (gltf) {
         // kelelawar
         const model = gltf.scene;
+        model.position.set(19, 5, -75);
+        model.rotation.y = Math.PI * 1.5;
+        model.scale.set(1, 1, 1);
+        scene.add(model);
+        kelelawar1Model = model;
+        if (gltf.animations.length > 0) {
+          const mixer = new THREE.AnimationMixer(model);
+          mixer.clipAction(gltf.animations[0]).play();
+          mixers.push(mixer);
+        }
+      });
+
+      loader.load("./assets/hewan1/scene.gltf", function (gltf) {
+        // kelelawar
+        const model = gltf.scene;
         model.position.set(16, 5, -75);
         model.rotation.y = Math.PI * 1.5;
         model.scale.set(1, 1, 1);
         scene.add(model);
-        hewan1Model = model;
+        kelelawar2Model = model;
+        if (gltf.animations.length > 0) {
+          const mixer = new THREE.AnimationMixer(model);
+          mixer.clipAction(gltf.animations[0]).play();
+          mixers.push(mixer);
+        }
+      });
+
+      loader.load("./assets/hewan1/scene.gltf", function (gltf) {
+        // kelelawar
+        const model = gltf.scene;
+        model.position.set(13, 5, -75);
+        model.rotation.y = Math.PI * 1.5;
+        model.scale.set(1, 1, 1);
+        scene.add(model);
+        kelelawar3Model = model;
         if (gltf.animations.length > 0) {
           const mixer = new THREE.AnimationMixer(model);
           mixer.clipAction(gltf.animations[0]).play();
@@ -240,7 +272,9 @@
           const distance = camera.position.distanceTo(pianoModel.position);
           if (distance < 10) {
             audio.pause();
-            hewan1Model.position.z += delta * 30;
+            kelelawar1Model.position.z += delta * 30;
+            kelelawar2Model.position.z += delta * 30;
+            kelelawar3Model.position.z += delta * 30;
             batSound.play();
           } else {
             audio.play();
