@@ -21,6 +21,8 @@
     <audio id="id-batu" src="./assets/suaraBatu.mp3"></audio>
     <audio id="id-kelelawar" src="./assets/batSound.mp3"></audio>
     <audio id="id-mumi" src="./assets/soundMumi.mp3"></audio>
+    <audio id="id-demon" src="./assets/demonVoice.mp3"></audio>
+    <audio id="id-spider" src="./assets/spiderAttack.mp3"></audio>
     <script src="three.js"></script>
     <script type="module" src="GLTFLoader.js"></script>
     <script type="module">
@@ -47,6 +49,8 @@
       const audioBatu = document.getElementById("id-batu");
       const batSound = document.getElementById("id-kelelawar");
       const soundMumi = document.getElementById("id-mumi");
+      const demon = document.getElementById("id-demon");
+      const spiderAttack = document.getElementById("id-spider");
       const mixers = [];
       let pianoModel;
       let kelelawar1Model;
@@ -473,8 +477,10 @@
           const distance = camera.position.distanceTo(ularModel.position);
           if (distance < 13) {
             ularSpotLight.intensity = 1.5;
+            demon.play();
           } else {
             ularSpotLight.intensity = 0;
+            demon.pause();
           }
         }
 
@@ -487,7 +493,6 @@
             kelelawar3Model.position.z += delta * 100;
             batSound.play();
 
-            // Atur interval untuk mematikan dan menyalakan lampu
             if (!timerId) {
               timerId = setInterval(() => {
                 lampuMejaSpotLight.intensity =
@@ -497,11 +502,10 @@
           } else {
             piano.play();
             batSound.pause();
-            // Hentikan interval jika ada
             if (timerId) {
               clearInterval(timerId);
               timerId = null;
-              lampuMejaSpotLight.intensity = 1.5; // Pastikan lampu menyala
+              lampuMejaSpotLight.intensity = 1.5; 
             }
           }
         }
@@ -571,9 +575,11 @@
           if (distance < 10) {
             hewan3Action1.stop();
             hewan3Action2.play();
+            spiderAttack.play();
           } else {
             hewan3Action2.stop();
             hewan3Action1.play();
+            spiderAttack.pause();
           }
           if (movingLeft) {
             hewan3Model.position.x -= delta * 3;
