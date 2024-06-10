@@ -17,7 +17,12 @@
 
   <body>
     <canvas class="webgl"></canvas>
-    <audio id="id-piano" src="./assets/horrorPianoBacksound.mp3" loop autoplay></audio>
+    <audio
+      id="id-piano"
+      src="./assets/horrorPianoBacksound.mp3"
+      loop
+      autoplay
+    ></audio>
     <audio id="id-batu" src="./assets/suaraBatu.mp3"></audio>
     <audio id="id-kelelawar" src="./assets/batSound.mp3"></audio>
     <audio id="id-mumi" src="./assets/soundMumi.mp3"></audio>
@@ -52,17 +57,17 @@
       const demon = document.getElementById("id-demon");
       const spiderAttack = document.getElementById("id-spider");
       const mixers = [];
-      let pianoModel;
+      let pianoModel, pianoBox;
       let kelelawar1Model;
       let kelelawar2Model;
       let kelelawar3Model;
-      let ularModel;
+      let ularModel, ularBox, ularSpotLight;
       let hewan2Model;
       let hewan3Model;
       let hewan3Mixer, hewan3Action1, hewan3Action2;
-      let patung1Model;
-      let patung4Model;
-      let patung5Model;
+      let patung1Model, patung1Box;
+      let patung4Model, patung4Box;
+      let patung5Model, patung5Box;
       let patung5Mixer, patung5Action;
       let movingLeft = true;
       let movingUp = true;
@@ -70,9 +75,10 @@
       let fallenAngle = 0;
       let arah = "right";
       const targetAngle = Math.PI / 2;
-      let ularSpotLight;
       let lampuMejaSpotLight;
       let timerId;
+      let tembok1Model, tembok1Box, tembok2Model, tembok2Box;
+      let lampu1Box, lampu2Box, lampu3Box;
 
       const loader = new GLTFLoader();
       const orbitcontrol = new OrbitControls(camera, renderer.domElement);
@@ -108,6 +114,12 @@
         model.rotation.y = 4.5;
         scene.add(model);
         patung1Model = model;
+
+        patung1Box = new THREE.Box3().setFromObject(patung1Model);
+
+        // Create a helper to visualize the bounding box
+        const helper = new THREE.Box3Helper(patung1Box, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/patung2/scene.gltf", function (gltf) {
@@ -123,7 +135,7 @@
         ularSpotLight = new THREE.SpotLight(0xff0000);
         ularSpotLight.position.set(
           ularModel.position.x + 3,
-          ularModel.position.y + 13,
+          ularModel.position.y + 10,
           ularModel.position.z
         );
         ularSpotLight.target.position.set(
@@ -134,7 +146,7 @@
         ularSpotLight.target.updateMatrixWorld();
         ularSpotLight.castShadow = true;
         ularSpotLight.intensity = 0;
-        ularSpotLight.angle = Math.PI ;
+        ularSpotLight.angle = Math.PI;
         ularSpotLight.distance = 50;
         ularSpotLight.penumbra = 0.5;
         ularSpotLight.decay = 3;
@@ -144,6 +156,13 @@
 
         scene.add(ularSpotLight);
         scene.add(ularSpotLight.target);
+
+        // Compute the bounding box
+        ularBox = new THREE.Box3().setFromObject(ularModel);
+
+        // Create a helper to visualize the bounding box
+        const helper = new THREE.Box3Helper(ularBox, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/patung4/scene.gltf", function (gltf) {
@@ -154,6 +173,11 @@
         model.rotation.y = 1.5;
         scene.add(model);
         patung4Model = model;
+
+        patung4Box = new THREE.Box3().setFromObject(patung4Model);
+
+        const helper = new THREE.Box3Helper(patung4Box, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/patung5/scene.gltf", function (gltf) {
@@ -169,6 +193,11 @@
           patung5Action = patung5Mixer.clipAction(gltf.animations[0]);
           mixers.push(patung5Mixer);
         }
+
+        patung5Box = new THREE.Box3().setFromObject(patung5Model);
+
+        const helper = new THREE.Box3Helper(patung5Box, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/piano/scene.gltf", function (gltf) {
@@ -178,6 +207,11 @@
         model.scale.set(0.006, 0.006, 0.006);
         scene.add(model);
         pianoModel = model;
+
+        pianoBox = new THREE.Box3().setFromObject(pianoModel);
+
+        const helper = new THREE.Box3Helper(pianoBox, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/lampu1/scene.gltf", function (gltf) {
@@ -204,6 +238,11 @@
 
         scene.add(spotLight);
         scene.add(spotLight.target);
+
+        lampu1Box = new THREE.Box3().setFromObject(model);
+
+        const helper = new THREE.Box3Helper(lampu1Box, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/lampu1/scene.gltf", function (gltf) {
@@ -230,6 +269,11 @@
 
         scene.add(spotLight);
         scene.add(spotLight.target);
+
+        lampu2Box = new THREE.Box3().setFromObject(model);
+
+        const helper = new THREE.Box3Helper(box, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/lampu1/scene.gltf", function (gltf) {
@@ -256,6 +300,11 @@
 
         scene.add(spotLight);
         scene.add(spotLight.target);
+
+        lampu3Box = new THREE.Box3().setFromObject(model);
+
+        const helper = new THREE.Box3Helper(lampu2Box, 0xff0000);
+        scene.add(helper);
       });
 
       loader.load("./assets/lampu2/scene.gltf", function (gltf) {
@@ -267,7 +316,11 @@
 
         lampuMejaSpotLight = new THREE.SpotLight(0xffd8b1);
         lampuMejaSpotLight.position.set(9.7, 5.7, -69.5);
-        lampuMejaSpotLight.target.position.set(model.position.x, 0, model.position.z);
+        lampuMejaSpotLight.target.position.set(
+          model.position.x,
+          0,
+          model.position.z
+        );
         lampuMejaSpotLight.target.updateMatrixWorld();
         lampuMejaSpotLight.castShadow = true;
         lampuMejaSpotLight.intensity = 1.5;
@@ -306,7 +359,7 @@
         //scene.add(sphelper);
 
         scene.add(spotLight);
-        scene.add(spotLight.target);  
+        scene.add(spotLight.target);
       });
 
       loader.load("./assets/hewan3/scene.gltf", function (gltf) {
@@ -390,19 +443,33 @@
       loader.load("./assets/tembok/scene.gltf", function (gltf) {
         //tembok 1
         const model = gltf.scene;
-        model.position.set(10, 9, -38);
-        model.scale.set(2, 7, 5);
+        model.position.set(10, 9, -42);
+        model.scale.set(4, 7, 5);
         model.rotation.y = Math.PI / 2;
         scene.add(model);
+
+        tembok1Model = model;
+
+        tembok1Box = new THREE.Box3().setFromObject(tembok1Model);
+
+        const helper = new THREE.Box3Helper(tembok1Box, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/tembok/scene.gltf", function (gltf) {
         //tembok 2
         const model = gltf.scene;
-        model.position.set(45, 9, -39);
-        model.scale.set(2, 7, 5);
+        model.position.set(45, 9, -43);
+        model.scale.set(4, 7, 5);
         model.rotation.y = Math.PI / 2;
         scene.add(model);
+
+        tembok2Model = model;
+
+        tembok2Box = new THREE.Box3().setFromObject(tembok2Model);
+
+        const helper = new THREE.Box3Helper(tembok2Box, 0xff0000);
+        // scene.add(helper);
       });
 
       const keyboard = {};
@@ -432,11 +499,12 @@
         minY: 7.7,
         maxY: 8,
         minZ: -75,
-        maxZ: 2
+        maxZ: 2,
       };
 
       function animate() {
         requestAnimationFrame(animate);
+
         const delta = clock.getDelta();
         mixers.forEach((mixer) => mixer.update(delta));
 
@@ -472,6 +540,126 @@
 
         camera.position.copy(newPosition);
 
+        if (ularBox) {
+          // Check if the camera is inside the bounding box
+          if (ularBox.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (patung1Box) {
+          // Check if the camera is inside the bounding box
+          if (patung1Box.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (patung4Box) {
+          // Check if the camera is inside the bounding box
+          if (patung4Box.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (patung5Box) {
+          // Check if the camera is inside the bounding box
+          if (patung5Box.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (pianoBox) {
+          // Check if the camera is inside the bounding box
+          if (pianoBox.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (lampu2Box) {
+          // Check if the camera is inside the bounding box
+          if (lampu2Box.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (lampu1Box) {
+          // Check if the camera is inside the bounding box
+          if (lampu1Box.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (lampu3Box) {
+          // Check if the camera is inside the bounding box
+          if (lampu3Box.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (tembok1Box) {
+          // Check if the camera is inside the bounding box
+          if (tembok1Box.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
+        if (tembok2Box) {
+          // Check if the camera is inside the bounding box
+          if (tembok2Box.containsPoint(camera.position)) {
+            // Simple collision response: move the camera back along its viewing direction
+            const direction = camera.getWorldDirection(new THREE.Vector3());
+            camera.position.sub(direction.multiplyScalar(3));
+
+            // Optional: you can also log or perform additional adjustments here
+            console.log("Collision detected! Adjusting camera position.");
+          }
+        }
+
         // pengecekan lampu merah nyala di patung ular
         if (ularModel) {
           const distance = camera.position.distanceTo(ularModel.position);
@@ -505,7 +693,7 @@
             if (timerId) {
               clearInterval(timerId);
               timerId = null;
-              lampuMejaSpotLight.intensity = 1.5; 
+              lampuMejaSpotLight.intensity = 1.5;
             }
           }
         }
