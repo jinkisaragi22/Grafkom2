@@ -117,8 +117,7 @@
 
         patung1Box = new THREE.Box3().setFromObject(patung1Model);
 
-        // Create a helper to visualize the bounding box
-        const helper = new THREE.Box3Helper(patung1Box, 0xff0000);
+        //const helper = new THREE.Box3Helper(patung1Box, 0xff0000);
         // scene.add(helper);
       });
 
@@ -157,11 +156,9 @@
         scene.add(ularSpotLight);
         scene.add(ularSpotLight.target);
 
-        // Compute the bounding box
         ularBox = new THREE.Box3().setFromObject(ularModel);
 
-        // Create a helper to visualize the bounding box
-        const helper = new THREE.Box3Helper(ularBox, 0xff0000);
+        // const helper = new THREE.Box3Helper(ularBox, 0xff0000);
         // scene.add(helper);
       });
 
@@ -176,7 +173,7 @@
 
         patung4Box = new THREE.Box3().setFromObject(patung4Model);
 
-        const helper = new THREE.Box3Helper(patung4Box, 0xff0000);
+        // const helper = new THREE.Box3Helper(patung4Box, 0xff0000);
         // scene.add(helper);
       });
 
@@ -196,7 +193,7 @@
 
         patung5Box = new THREE.Box3().setFromObject(patung5Model);
 
-        const helper = new THREE.Box3Helper(patung5Box, 0xff0000);
+        // const helper = new THREE.Box3Helper(patung5Box, 0xff0000);
         // scene.add(helper);
       });
 
@@ -210,7 +207,7 @@
 
         pianoBox = new THREE.Box3().setFromObject(pianoModel);
 
-        const helper = new THREE.Box3Helper(pianoBox, 0xff0000);
+        // const helper = new THREE.Box3Helper(pianoBox, 0xff0000);
         // scene.add(helper);
       });
 
@@ -241,7 +238,7 @@
 
         lampu1Box = new THREE.Box3().setFromObject(model);
 
-        const helper = new THREE.Box3Helper(lampu1Box, 0xff0000);
+        // const helper = new THREE.Box3Helper(lampu1Box, 0xff0000);
         // scene.add(helper);
       });
 
@@ -272,7 +269,7 @@
 
         lampu2Box = new THREE.Box3().setFromObject(model);
 
-        const helper = new THREE.Box3Helper(box, 0xff0000);
+        // const helper = new THREE.Box3Helper(lampu2Box, 0xff0000);
         // scene.add(helper);
       });
 
@@ -303,8 +300,8 @@
 
         lampu3Box = new THREE.Box3().setFromObject(model);
 
-        const helper = new THREE.Box3Helper(lampu2Box, 0xff0000);
-        scene.add(helper);
+        // const helper = new THREE.Box3Helper(lampu3Box, 0xff0000);
+        // scene.add(helper);
       });
 
       loader.load("./assets/lampu2/scene.gltf", function (gltf) {
@@ -452,7 +449,7 @@
 
         tembok1Box = new THREE.Box3().setFromObject(tembok1Model);
 
-        const helper = new THREE.Box3Helper(tembok1Box, 0xff0000);
+        // const helper = new THREE.Box3Helper(tembok1Box, 0xff0000);
         // scene.add(helper);
       });
 
@@ -468,7 +465,7 @@
 
         tembok2Box = new THREE.Box3().setFromObject(tembok2Model);
 
-        const helper = new THREE.Box3Helper(tembok2Box, 0xff0000);
+        // const helper = new THREE.Box3Helper(tembok2Box, 0xff0000);
         // scene.add(helper);
       });
 
@@ -541,122 +538,74 @@
         camera.position.copy(newPosition);
 
         if (ularBox) {
-          // Check if the camera is inside the bounding box
+          // cek kamera di dalem box ato ngga
           if (ularBox.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
+            // Kalo iya, dorong kamera kebelakang
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (patung1Box) {
-          // Check if the camera is inside the bounding box
           if (patung1Box.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (patung4Box) {
-          // Check if the camera is inside the bounding box
           if (patung4Box.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (patung5Box) {
-          // Check if the camera is inside the bounding box
           if (patung5Box.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (pianoBox) {
-          // Check if the camera is inside the bounding box
           if (pianoBox.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (lampu2Box) {
-          // Check if the camera is inside the bounding box
           if (lampu2Box.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (lampu1Box) {
-          // Check if the camera is inside the bounding box
           if (lampu1Box.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (lampu3Box) {
-          // Check if the camera is inside the bounding box
           if (lampu3Box.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (tembok1Box) {
-          // Check if the camera is inside the bounding box
           if (tembok1Box.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
         if (tembok2Box) {
-          // Check if the camera is inside the bounding box
           if (tembok2Box.containsPoint(camera.position)) {
-            // Simple collision response: move the camera back along its viewing direction
             const direction = camera.getWorldDirection(new THREE.Vector3());
-            camera.position.sub(direction.multiplyScalar(3));
-
-            // Optional: you can also log or perform additional adjustments here
-            console.log("Collision detected! Adjusting camera position.");
+            camera.position.sub(direction.multiplyScalar(0.1));
           }
         }
 
