@@ -17,12 +17,7 @@
 
   <body>
     <canvas class="webgl"></canvas>
-    <audio
-      id="background-music"
-      src="./assets/horrorPianoBacksound.mp3"
-      loop
-      autoplay
-    ></audio>
+    <audio id="id-piano" src="./assets/horrorPianoBacksound.mp3" loop autoplay></audio>
     <audio id="id-batu" src="./assets/suaraBatu.mp3"></audio>
     <audio id="id-kelelawar" src="./assets/batSound.mp3"></audio>
     <audio id="id-mumi" src="./assets/soundMumi.mp3"></audio>
@@ -48,7 +43,7 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      const audio = document.getElementById("background-music");
+      const piano = document.getElementById("id-piano");
       const audioBatu = document.getElementById("id-batu");
       const batSound = document.getElementById("id-kelelawar");
       const soundMumi = document.getElementById("id-mumi");
@@ -69,8 +64,11 @@
       let movingUp = true;
       let falling = false;
       let fallenAngle = 0;
+      let arah = "right";
       const targetAngle = Math.PI / 2;
       let ularSpotLight;
+      let lampuMejaSpotLight;
+      let timerId;
 
       const loader = new GLTFLoader();
       const orbitcontrol = new OrbitControls(camera, renderer.domElement);
@@ -152,6 +150,21 @@
         model.rotation.y = 1.5;
         scene.add(model);
         patung4Model = model;
+      });
+
+      loader.load("./assets/patung5/scene.gltf", function (gltf) {
+        // mumi
+        const model = gltf.scene;
+        model.position.set(45, -1.3, -45);
+        model.scale.set(0.4, 0.4, 0.4);
+        model.rotation.y = Math.PI * 1.5;
+        scene.add(model);
+        patung5Model = model;
+        if (gltf.animations.length > 0) {
+          patung5Mixer = new THREE.AnimationMixer(model);
+          patung5Action = patung5Mixer.clipAction(gltf.animations[0]);
+          mixers.push(patung5Mixer);
+        }
       });
 
       loader.load("./assets/piano/scene.gltf", function (gltf) {
@@ -248,26 +261,48 @@
         model.scale.set(0.05, 0.05, 0.05);
         scene.add(model);
 
+        lampuMejaSpotLight = new THREE.SpotLight(0xffd8b1);
+        lampuMejaSpotLight.position.set(9.7, 5.7, -69.5);
+        lampuMejaSpotLight.target.position.set(model.position.x, 0, model.position.z);
+        lampuMejaSpotLight.target.updateMatrixWorld();
+        lampuMejaSpotLight.castShadow = true;
+        lampuMejaSpotLight.intensity = 1.5;
+        lampuMejaSpotLight.angle = Math.PI / 4;
+        lampuMejaSpotLight.distance = 50;
+        lampuMejaSpotLight.penumbra = 1.5;
+        lampuMejaSpotLight.decay = 3;
+
+        //const sphelper = new THREE.SpotLightHelper(spotLight);
+        //scene.add(sphelper);
+
+        scene.add(lampuMejaSpotLight);
+        scene.add(lampuMejaSpotLight.target);
+      });
+
+      loader.load("./assets/lampu3/scene.gltf", function (gltf) {
+        //lampu nde kuda
+        const model = gltf.scene;
+        model.position.set(47, 8, -24.8);
+        model.scale.set(1, 1, 1);
+        model.rotation.y = Math.PI * 1.5;
+        scene.add(model);
+
         const spotLight = new THREE.SpotLight(0xffd8b1);
-        spotLight.position.set(
-          model.position.x,
-          model.position.y + 2,
-          model.position.z
-        );
+        spotLight.position.set(45, 12, -24.4);
         spotLight.target.position.set(model.position.x, 0, model.position.z);
         spotLight.target.updateMatrixWorld();
         spotLight.castShadow = true;
         spotLight.intensity = 1.5;
-        spotLight.angle = Math.PI / 4;
+        spotLight.angle = Math.PI / 3;
         spotLight.distance = 50;
         spotLight.penumbra = 1.5;
-        spotLight.decay = 3;
+        spotLight.decay = 2;
 
-        // const sphelper = new THREE.SpotLightHelper(spotLight);
-        // scene.add(sphelper);
+        //const sphelper = new THREE.SpotLightHelper(spotLight);
+        //scene.add(sphelper);
 
         scene.add(spotLight);
-        scene.add(spotLight.target);
+        scene.add(spotLight.target);  
       });
 
       loader.load("./assets/hewan3/scene.gltf", function (gltf) {
@@ -321,7 +356,7 @@
       loader.load("./assets/hewan1/scene.gltf", function (gltf) {
         // kelelawar
         const model = gltf.scene;
-        model.position.set(16, 5, -75);
+        model.position.set(16, 10, -75);
         model.rotation.y = Math.PI * 1.5;
         model.scale.set(1, 1, 1);
         scene.add(model);
@@ -336,7 +371,7 @@
       loader.load("./assets/hewan1/scene.gltf", function (gltf) {
         // kelelawar
         const model = gltf.scene;
-        model.position.set(13, 5, -75);
+        model.position.set(13, 10, -75);
         model.rotation.y = Math.PI * 1.5;
         model.scale.set(1, 1, 1);
         scene.add(model);
@@ -345,23 +380,6 @@
           const mixer = new THREE.AnimationMixer(model);
           mixer.clipAction(gltf.animations[0]).play();
           mixers.push(mixer);
-        }
-      });
-
-      loader.load("./assets/patung5/scene.gltf", function (gltf) {
-        // mumi
-        const model = gltf.scene;
-        model.position.set(45, -1.3, -45);
-        model.scale.set(0.35, 0.35, 0.35);
-        model.rotation.x = 0;
-        model.rotation.y = Math.PI * 1.5;
-        model.rotation.z = 0;
-        scene.add(model);
-        patung5Model = model;
-        if (gltf.animations.length > 0) {
-          patung5Mixer = new THREE.AnimationMixer(model);
-          patung5Action = patung5Mixer.clipAction(gltf.animations[0]);
-          mixers.push(patung5Mixer);
         }
       });
 
@@ -403,8 +421,6 @@
       camera.position.set(27, 6, -3);
       // camera.position.set(27, 5, -60);
       // camera.lookAt(12,5,-60)
-
-      let arah = "right";
 
       const boundaries = {
         minX: 10,
@@ -452,25 +468,41 @@
 
         camera.position.copy(newPosition);
 
+        // pengecekan lampu merah nyala di patung ular
         if (ularModel) {
           const distance = camera.position.distanceTo(ularModel.position);
-          if (distance < 10) {
+          if (distance < 13) {
             ularSpotLight.intensity = 1.5;
           } else {
             ularSpotLight.intensity = 0;
           }
         }
 
-        // pengecekan sound piano
+        // pengecekan animasi pas ndeket ke piano
         if (pianoModel) {
           const distance = camera.position.distanceTo(pianoModel.position);
-          if (distance < 10) {
-            audio.pause();
-            kelelawar2Model.position.z += delta * 30;
-            kelelawar3Model.position.z += delta * 30;
+          if (distance < 15) {
+            piano.pause();
+            kelelawar2Model.position.z += delta * 100;
+            kelelawar3Model.position.z += delta * 100;
             batSound.play();
+
+            // Atur interval untuk mematikan dan menyalakan lampu
+            if (!timerId) {
+              timerId = setInterval(() => {
+                lampuMejaSpotLight.intensity =
+                  lampuMejaSpotLight.intensity === 0 ? 1.5 : 0;
+              }, 200);
+            }
           } else {
-            audio.play();
+            piano.play();
+            batSound.pause();
+            // Hentikan interval jika ada
+            if (timerId) {
+              clearInterval(timerId);
+              timerId = null;
+              lampuMejaSpotLight.intensity = 1.5; // Pastikan lampu menyala
+            }
           }
         }
 
@@ -536,7 +568,7 @@
 
         if (hewan3Model) {
           const distance = camera.position.distanceTo(hewan3Model.position);
-          if (distance < 7) {
+          if (distance < 10) {
             hewan3Action1.stop();
             hewan3Action2.play();
           } else {
@@ -574,7 +606,7 @@
 
         if (patung5Model) {
           const distance = camera.position.distanceTo(patung5Model.position);
-          if (distance < 10) {
+          if (distance < 15) {
             patung5Action.play();
             soundMumi.play();
           } else {
